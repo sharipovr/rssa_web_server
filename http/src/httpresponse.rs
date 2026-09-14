@@ -51,4 +51,54 @@ impl<'a> HttpResponse<'a> {
 
         response
     }
+
+    pub fn send_response(&self, write_stream: &mut impl Write) -> Result<()> {
+        let res = self.clone();
+        let response_string: String = String::from(res);
+        let _ = write!(write_stream, "{}", response_string);
+        Ok(())
+    }
+}
+
+// Getter methods for each member of the struct
+impl<'a> HttpResponse<'a> {
+    fn version(&self) -> &str {
+        self.version
+    }
+    fn status_code(&self) -> &str {
+        self.status_code
+    }
+    fn status_text(&self) -> &str {
+        self.status_text
+    }
+    fn headers(&self) -> String {
+        let map: HashMap<&str, &str> = self.headers.clone().unwrap();
+        let mut header_string: String = "".into();
+        for (k, v) in map.iter() {
+            header_string = format!("{}{}:{}\r\n", header_string, k, v);
+        }
+        header_string
+    }
+    pub fn body(&self) -> &str {
+        match &self.body {
+            Some(b) => b.as_str(),
+            None => "",
+        }
+    }
+}
+
+// Implementing the From trait, to convert (serialize) HttpResponse struct into HTTP response message string
+impl<'a> From<HttpResponse<'a>> for String {
+    fn from(res: HttpResponse) -> String {
+        let res1 = res.clone();
+        format!(
+            "{} {} {}\r\n{}Content-Lenght: {}\r\n\r\n{}",
+            &res1.version(),
+            &res1.status_code(),
+            &res1.status_text(),
+            &res1.headers(),
+            &res.body.unwrap().len(),
+            &res1.body()
+        )
+    }
 }
