@@ -2,11 +2,10 @@ use http::{httprequest::HttpRequest, httpresponse::HttpResponse};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
-use std::fmt::format;
 use std::fs;
 
 pub trait Handler {
-    fn handle(req: &HttpRequest) -> HttpResponse;
+    fn handle(req: &HttpRequest) -> HttpResponse<'_>;
     fn load_file(file_name: &str) -> Option<String> {
         let default_path = format!("{}/public", env!("CARGO_MANIFEST_DIR"));
         let public_path = env::var("PUBLIC_PATH").unwrap_or(default_path);
@@ -31,13 +30,13 @@ pub struct PageNotFoundHandler;
 pub struct WebServiceHandler;
 
 impl Handler for PageNotFoundHandler {
-    fn handle(_req: &HttpRequest) -> HttpResponse {
+    fn handle(_req: &HttpRequest) -> HttpResponse<'_> {
         HttpResponse::new("404", None, Self::load_file("404.html"))
     }
 }
 
 impl Handler for StaticPageHandler {
-    fn handle(req: &HttpRequest) -> HttpResponse {
+    fn handle(req: &HttpRequest) -> HttpResponse<'_> {
         // Get the path of static page resource being requested
         let http::httprequest::Resource::Path(s) = &req.resource;
 
@@ -77,7 +76,7 @@ impl WebServiceHandler {
 }
 // Implement the Handler trait
 impl Handler for WebServiceHandler {
-    fn handle(req: &HttpRequest) -> HttpResponse {
+    fn handle(req: &HttpRequest) -> HttpResponse<'_> {
         let http::httprequest::Resource::Path(s) = &req.resource;
 
         // Parse the URI

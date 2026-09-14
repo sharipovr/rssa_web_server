@@ -1,5 +1,5 @@
 // Router module inspects the incoming HTTP requests and figures out which handler to use
-use super::handler::{Handler, PageNotFoundHandler, StaticPageHandler, WebServiceHnadler};
+use super::handler::{Handler, PageNotFoundHandler, StaticPageHandler, WebServiceHandler};
 use http::{httprequest, httprequest::HttpRequest, httpresponse::HttpResponse};
 use std::io::prelude::*;
 pub struct Router;
@@ -14,7 +14,7 @@ impl Router {
                     match route[1] {
                         // if the route begins with /api, invoke web service
                         "api" => {
-                            let resp: HttpResponse = WebServiceHnadler::handle(&req);
+                            let resp: HttpResponse = WebServiceHandler::handle(&req);
                             let _ = resp.send_response(stream);
                         }
                         // Else invoke static page handler

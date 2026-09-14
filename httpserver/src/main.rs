@@ -5,7 +5,7 @@ use server::Server;
 
 fn main() {
     // Start a server
-    let server = Server::new("localhost:3000");
+    let server = Server::new("localhost:3001");
     // Run the server
     server.run();
 }
